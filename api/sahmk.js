@@ -1,39 +1,28 @@
 export default async function handler(req, res) {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
     return res.status(204).end();
   }
-
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300');
+  res.setHeader('Cache-Control', 's-maxage=120, stale-while-revalidate=600');
 
-  const apiPath = req.query.path || req.query.symbol ? `/quote/${req.query.symbol}/` : null;
-  if (!apiPath && !req.query.path) {
-    return res.status(400).json({ error: 'path or symbol required' });
-  }
-
-  const finalPath = req.query.path || apiPath;
-  const API_KEY = process.env.SAHMK_KEY || 'shmk_live_30015ec94962c7dd46acc73ebea15979d36e266f76ee8758';
+  const symbols = req.query.symbols;
+  if (!symbols) return res.status(400).json({ error: 'symbols param required' });
 
   try {
-    const url = `https://app.sahmk.sa/api/v1${finalPath}`;
-    const response = await fetch(url, {
-      headers: {
-        'X-API-Key': API_KEY,
-        'User-Agent': 'TasiPro/1.0'
-      }
+    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${encodeURIComponent(symbols)}`;
+    const r = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36' }
     });
-
-    if (!response.ok) {
-      return res.status(response.status).json({ error: `Sahmk API: ${response.status}` });
+    if (!r.ok) {
+      const url2 = `https://query2.finance.yahoo.com/v7/finance/quote?symbols=${encodeURIComponent(symbols)}`;
+      const r2 = await fetch(url2, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+      if (!r2.ok) throw new Error('Yahoo API failed');
+      return res.status(200).json(await r2.json());
     }
-
-    const data = await response.json();
-    return res.status(200).json(data);
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(200).json(await r.json());
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
   }
 }
