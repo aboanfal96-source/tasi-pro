@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>تاسي برو | منصة الأسهم السعودية الذكية — أبو مارية</title>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&family=Noto+Kufi+Arabic:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{
+--bg:#08070d;--bg1:#110f1a;--bg2:#1a1726;--bg3:#262137;
+--brd:rgba(255,255,255,.06);--brd2:rgba(255,255,255,.12);
+--t1:#f0eef5;--t2:#9b95ab;--t3:#5c5672;
+--blue:#6d8af8;--green:#00d4aa;--red:#ff5c72;--yellow:#ffc233;
+--cyan:#3dd8e0;--purple:#a78bfa;--pink:#f472b6;--orange:#ff8c42;
+--gold:#ffd700;--emerald:#34d399;--accent:#c084fc;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Readex Pro','Noto Kufi Arabic',sans-serif;background:var(--bg);color:var(--t1);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:3px}
+.noscroll::-webkit-scrollbar{display:none}.noscroll{scrollbar-width:none}
+.tabnum{font-variant-numeric:tabular-nums}
+
+/* NAV */
+.topnav{background:rgba(3,6,12,.95);backdrop-filter:blur(30px);border-bottom:1px solid var(--brd);position:sticky;top:0;z-index:200;padding:8px 16px}
+.topnav-inner{max-width:1520px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+
+/* MAIN TABS */
+.main-tabs{display:flex;gap:2px;background:var(--bg1);border:1px solid var(--brd);border-radius:12px;padding:3px;margin:12px auto;max-width:1520px;overflow-x:auto}
+.main-tab{flex:1;min-width:0;padding:10px 8px;border-radius:10px;border:none;background:transparent;color:var(--t3);font-size:11px;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:5px}
+.main-tab:hover{color:var(--t2);background:rgba(255,255,255,.02)}
+.main-tab.on{background:linear-gradient(135deg,rgba(255,140,66,.15),rgba(255,194,51,.1));color:#ffc233;box-shadow:0 0 20px rgba(255,194,51,.08)}
+.main-tab i{font-size:13px}
+
+/* PAGE */
+.page{display:none;max-width:1520px;margin:0 auto;padding:0 16px 80px}
+.page.active{display:block}
+
+/* CARDS */
+.crd{background:rgba(15,23,42,.8);backdrop-filter:blur(16px);border:1px solid var(--brd);border-radius:14px}
+.crd-head{padding:14px 16px;border-bottom:1px solid var(--brd);display:flex;justify-content:space-between;align-items:center}
+.crd-body{padding:16px}
+.crd-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+
+/* HEATMAP */
+.hm-container{display:flex;flex-wrap:wrap;gap:3px;padding:8px}
+.hm-cell{border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;min-height:50px}
+.hm-cell:hover{transform:scale(1.05);z-index:10;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.hm-cell .hm-sym{font-size:10px;font-weight:700;opacity:.9}
+.hm-cell .hm-chg{font-size:9px;font-weight:600}
+.hm-cell .hm-name{font-size:7px;opacity:.6;margin-top:1px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hm-tooltip{position:fixed;background:rgba(15,23,42,.95);border:1px solid var(--brd2);border-radius:10px;padding:12px 16px;z-index:999;pointer-events:none;font-size:12px;min-width:180px;box-shadow:0 12px 40px rgba(0,0,0,.5);display:none}
+
+/* AI CHAT */
+.ai-box{background:linear-gradient(135deg,rgba(59,130,246,.05),rgba(139,92,246,.03));border:1px solid rgba(59,130,246,.15);border-radius:14px;padding:20px}
+.ai-input-row{display:flex;gap:8px;margin-top:14px}
+.ai-input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--brd);border-radius:10px;padding:12px 16px;color:var(--t1);font-size:14px;font-family:inherit;outline:none}
+.ai-input:focus{border-color:var(--blue)}
+.ai-btn{background:linear-gradient(135deg,#ff8c42,#ffc233);border:none;border-radius:10px;padding:12px 24px;color:#08070d;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px}
+.ai-result{margin-top:16px;padding:16px;background:rgba(255,255,255,.02);border:1px solid var(--brd);border-radius:12px;line-height:1.8;font-size:13px;color:var(--t2);white-space:pre-wrap}
+.ai-result h4{color:var(--t1);margin:8px 0 4px;font-size:14px}
+.ai-loading{display:flex;align-items:center;gap:8px;color:var(--blue);font-size:13px;padding:20px}
+.ai-loading .spinner{width:16px;height:16px;border:2px solid rgba(59,130,246,.2);border-top-color:#3b82f6;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* COMPARISON */
+.cmp-card{flex:1;min-width:250px}
+.cmp-vs{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ef4444);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;flex-shrink:0;box-shadow:0 4px 20px rgba(249,115,22,.3)}
+.cmp-bar{height:8px;border-radius:4px;background:rgba(255,255,255,.05);overflow:hidden;margin:4px 0}
+.cmp-fill{height:100%;border-radius:4px;transition:width .5s ease}
+
+/* CALCULATOR */
+.calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.calc-field label{font-size:11px;color:var(--t3);display:block;margin-bottom:4px}
+.calc-field input,.calc-field select{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--brd);border-radius:8px;padding:10px 12px;color:var(--t1);font-size:14px;font-family:inherit;outline:none}
+.calc-result{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.calc-r-item{background:rgba(255,255,255,.02);border:1px solid var(--brd);border-radius:10px;padding:14px;text-align:center}
+.calc-r-item .lbl{font-size:10px;color:var(--t3);margin-bottom:4px}
+.calc-r-item .val{font-size:20px;font-weight:800}
+
+/* PULSE */
+.pulse-meter{position:relative;width:200px;height:100px;margin:0 auto}
+.pulse-ring{width:100%;display:flex;justify-content:center;gap:12px;margin-top:16px;flex-wrap:wrap}
+.pulse-item{background:rgba(255,255,255,.02);border:1px solid var(--brd);border-radius:10px;padding:12px 20px;text-align:center;flex:1;min-width:100px}
+.mood-bar{height:12px;border-radius:6px;background:linear-gradient(90deg,#ef4444,#eab308,#10b981);position:relative;margin:12px 0}
+.mood-marker{position:absolute;top:-4px;width:20px;height:20px;border-radius:50%;background:white;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:left .5s ease}
+
+/* PATTERN SCANNER */
+.pattern-item{display:flex;align-items:center;gap:14px;padding:12px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid var(--brd);cursor:pointer;transition:.15s}
+.pattern-item:hover{border-color:var(--brd2);background:rgba(255,255,255,.03)}
+.pattern-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.pattern-badge{padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700}
+
+/* AI LEADERBOARD */
+.lb-row{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid var(--brd);transition:.15s;cursor:pointer}
+.lb-row:hover{border-color:var(--brd2)}
+.lb-rank{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+.lb-score-bar{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.05);overflow:hidden}
+.lb-score-fill{height:100%;border-radius:3px}
+
+/* INP SHARED */
+.inp{background:rgba(255,255,255,.04);border:1px solid var(--brd);border-radius:8px;padding:8px 12px;color:var(--t1);font-size:12px;outline:none;font-family:inherit}
+.inp:focus{border-color:var(--blue)}
+select.inp{appearance:none;cursor:pointer;padding-left:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 10px center}
+
+/* ANIM */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(59,130,246,.1)}50%{box-shadow:0 0 40px rgba(59,130,246,.2)}}
+.anim{animation:fadeUp .4s ease-out both}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+.main-tab{font-size:10px;padding:8px 6px;flex:0 0 auto}
+.main-tabs{overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start}
+}
+
+/* TOAST */
+.toast-c{position:fixed;top:60px;left:16px;z-index:999}
+.toast-i{padding:10px 16px;border-radius:10px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;backdrop-filter:blur(16px);box-shadow:0 8px 32px rgba(0,0,0,.4);transform:translateX(-120%);transition:transform .25s;margin-bottom:6px}
+.toast-i.show{transform:translateX(0)}
+.t-ok{background:rgba(16,185,129,.9);color:white}
+
+/* STATUS INDICATOR */
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-left:6px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.status-live{background:#00d4aa;box-shadow:0 0 8px #00d4aa}
+.status-delayed{background:#ffc233;box-shadow:0 0 8px #ffc233}
+.status-offline{background:#ff5c72}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="topnav">
+<div class="topnav-inner">
+<div style="display:flex;align-items:center;gap:10px">
+<div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#ff8c42,#ffc233);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(255,140,66,.3)">
+<i class="fas fa-bolt" style="color:#08070d;font-size:14px"></i>
+</div>
+<div>
+<h1 style="font-size:15px;font-weight:900;font-family:'Noto Kufi Arabic';background:linear-gradient(135deg,#ffc233,#ff8c42,#ff5c72);-webkit-background-clip:text;-webkit-text-fill-color:transparent">تاسي برو</h1>
+<p style="font-size:9px;color:var(--t3)">أبو مارية • منصة ذكية للمتداول السعودي</p>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:8px">
+<span id="dataSource" style="font-size:9px;padding:3px 8px;border-radius:6px;border:1px solid rgba(255,194,51,.3);background:rgba(255,194,51,.08);color:#ffc233;display:flex;align-items:center">
+<span class="status-dot status-offline" id="statusDot"></span>
+<span id="statusText">جاري الاتصال...</span>
+</span>
+<span style="font-size:10px;color:var(--t3)">تاسي</span>
+<span class="tabnum" style="font-size:14px;font-weight:800;color:var(--green)" id="tasiVal">--</span>
+<span class="tabnum" style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;background:rgba(16,185,129,.1);color:var(--green)" id="tasiChg">--%</span>
+<span class="tabnum" style="font-size:12px;font-weight:700;margin-right:8px" id="clock">--:--</span>
+</div>
+</div>
+</nav>
+
+<!-- TradingView Ticker Tape - Real Prices -->
+<div id="tvTicker" style="border-bottom:1px solid var(--brd);overflow:hidden;height:46px"></div>
+
+<!-- MAIN TABS -->
+<div class="main-tabs noscroll" style="margin:8px 16px 0">
+<button class="main-tab on" onclick="showPage('heatmap',this)">🔥 خريطة السوق</button>
+<button class="main-tab" onclick="showPage('ai',this)">🧠 تحليل ذكي</button>
+<button class="main-tab" onclick="showPage('compare',this)">⚖️ مقارنة</button>
+<button class="main-tab" onclick="showPage('calc',this)">🧮 حاسبة</button>
+<button class="main-tab" onclick="showPage('pulse',this)">💗 نبض السوق</button>
+<button class="main-tab" onclick="showPage('leaderboard',this)">🏆 ترتيب AI</button>
+<button class="main-tab" onclick="showPage('patterns',this)">🎯 الاستراتيجيات</button>
+</div>
+
+<!-- ===== PAGE 1: HEATMAP ===== -->
+<div class="page active" id="pg-heatmap">
+<div class="crd anim" style="margin-top:12px">
+<div class="crd-head">
+<div class="crd-title"><i class="fas fa-fire" style="color:var(--orange)"></i> خريطة السوق الحرارية</div>
+<div style="display:flex;gap:6px">
+<select class="inp" onchange="hmFilter(this.value)" style="font-size:11px">
+<option value="all">جميع القطاعات</option>
+</select>
+<select class="inp" onchange="hmSize(this.value)" style="font-size:11px">
+<option value="cap">حسب القيمة السوقية</option>
+<option value="vol">حسب الحجم</option>
+<option value="equal">متساوي</option>
+</select>
+</div>
+</div>
+<div class="crd-body">
+<div class="hm-container" id="heatmapGrid"></div>
+</div>
+</div>
+<div class="hm-tooltip" id="hmTip"></div>
+</div>
+
+<!-- ===== PAGE 2: AI ANALYSIS ===== -->
+<div class="page" id="pg-ai">
+<div class="crd anim" style="margin-top:12px">
+<div class="crd-head">
+<div class="crd-title"><i class="fas fa-brain" style="color:var(--purple)"></i> تحليل ذكي بالذكاء الاصطناعي</div>
+</div>
+<div class="crd-body">
+<div class="ai-box">
+<div style="text-align:center;margin-bottom:12px">
+<h3 style="font-size:18px;font-weight:800;font-family:'Noto Kufi Arabic';margin-bottom:4px">🧠 محلل الأسهم الذكي</h3>
+<p style="color:var(--t3);font-size:12px">أدخل رمز أو اسم السهم واحصل على تحليل فني وأساسي فوري مدعوم بالذكاء الاصطناعي</p>
+</div>
+<div class="ai-input-row">
+<input class="ai-input" id="aiInput" placeholder="مثال: 1120 أو الراجحي..." onkeypress="if(event.key==='Enter')runAI()">
+<button class="ai-btn" onclick="runAI()"><i class="fas fa-wand-magic-sparkles"></i> حلّل</button>
+</div>
+</div>
+<div id="aiOutput"></div>
+</div>
+</div>
+</div>
+
+<!-- ===== PAGE 3: COMPARISON ===== -->
+<div class="page" id="pg-compare">
+<div class="crd anim" style="margin-top:12px">
+<div class="crd-head">
+<div class="crd-title"><i class="fas fa-scale-balanced" style="color:var(--cyan)"></i> مقارنة أسهم Head-to-Head</div>
+</div>
+<div class="crd-body">
+<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+<select class="inp" id="cmpA" style="flex:1;min-width:140px" onchange="runCompare()"></select>
+<div class="cmp-vs" style="align-self:center">VS</div>
+<select class="inp" id="cmpB" style="flex:1;min-width:140px" onchange="runCompare()"></select>
+</div>
+<div id="cmpResult"></div>
+</div>
+</div>
+</div>
+
+<!-- ===== PAGE 4: CALCULATOR ===== -->
+<div class="page" id="pg-calc">
+<div class="crd anim" style="margin-top:12px">
+<div class="crd-head">
+<div class="crd-title"><i class="fas fa-calculator" style="color:var(--green)"></i> حاسبة الربح والخسارة</div>
+</div>
+<div class="crd-body">
+<div class="calc-grid">
+<div class="calc-field"><label>سعر الشراء (ر.س)</label><input type="number" id="calcBuy" placeholder="50.00" oninput="doCalc()"></div>
+<div class="calc-field"><label>الكمية (سهم)</label><input type="number" id="calcQty" placeholder="1000" oninput="doCalc()"></div>
+<div class="calc-field"><label>الهدف (ر.س)</label><input type="number" id="calcTarget" placeholder="55.00" oninput="doCalc()"></div>
+<div class="calc-field"><label>وقف الخسارة (ر.س)</label><input type="number" id="calcStop" placeholder="48.00" oninput="doCalc()"></div>
+<div class="calc-field"><label>عمولة الوساطة (%)</label><input type="number" id="calcComm" placeholder="0.155" value="0.155" oninput="doCalc()"></div>
+</div>
+<div class="calc-result" id="calcResult"></div>
+</div>
+</div>
+</div>
+
+<!-- ===== PAGE 5: MARKET PULSE ===== -->
+<div class="page" id="pg-pulse">
+<div class="crd anim" style="margin-top:12px">
+<div class="crd-head">
+<div class="crd-title"><i class="fas fa-heart-pulse" style="color:var(--red)"></i> نبض السوق — Market Pulse</div>
+</div>
+<div class="crd-body" id="pulseBody"></div>
+</div>
+</div>
+
+<!-- ===== PAGE 6: AI LEADERBOARD ===== -->
+<div class="page" id="pg-leaderboard">
+<div class="crd anim" style="margin-top:12px">
+<div class="crd-head">
+<div class="crd-title"><i class="fas fa-trophy" style="color:var(--yellow)"></i> ترتيب الأسهم بالذكاء الاصطناعي — AI Score</div>
+<select class="inp" id="lbFilter" onchange="drawLB()" style="font-size:11px">
+<option value="all">جميع القطاعات</option>
+</select>
+</div>
+<div class="crd-body">
+<div id="lbList" style="display:flex;flex-direction:column;gap:6px"></div>
+</div>
+</div>
+</div>
+
+<!-- ===== PAGE 7: PATTERN SCANNER ===== -->
+<div class="page" id="pg-patterns">
+<div class="crd anim" style="margin-top:12px">
+<div class="crd-head">
+<div class="crd-title">🎯 كاشف الاستراتيجيات والأنماط</div>
+<div style="display:flex;gap:6px;flex-wrap:wrap">
+<select class="inp" id="patCat" onchange="drawPatterns()" style="font-size:11px">
+<option value="all">جميع الاستراتيجيات</option>
+<option value="elliott">🌊 موجات إليوت</option>
+<option value="supertrend">📈 سوبرترند</option>
+<option value="wyckoff">🏗️ وايكوف</option>
+<option value="harmonic">🔷 توافقية</option>
+<option value="ict">🧊 ICT / SMC</option>
+<option value="classic">⛰️ أنماط كلاسيكية</option>
+<option value="fibonacci">🔢 فيبوناتشي</option>
+<option value="volume">📊 حجم وسيولة</option>
+</select>
+<select class="inp" id="patFilter" onchange="drawPatterns()" style="font-size:11px">
+<option value="all">الكل</option>
+<option value="bullish">صاعدة ▲</option>
+<option value="bearish">هابطة ▼</option>
+</select>
+</div>
+</div>
+<div class="crd-body">
+<div id="patList" style="display:flex;flex-direction:column;gap:8px"></div>
+</div>
+</div>
+</div>
+
+<div class="toast-c" id="toastC"></div>
+
+<script>
+// ==============================
+// STOCK DATABASE (214 stocks)
+// ==============================
+const DB=[
+{s:'1010',n:'الرياض',sec:'bank',bp:28.66},{s:'1020',n:'الجزيرة',sec:'bank',bp:17.50},{s:'1030',n:'الاستثمار',sec:'bank',bp:16.40},{s:'1050',n:'بي إس إف',sec:'bank',bp:42.30},{s:'1060',n:'الأول',sec:'bank',bp:35.50},{s:'1080',n:'العربي',sec:'bank',bp:23.10},{s:'1120',n:'الراجحي',sec:'bank',bp:101.20},{s:'1140',n:'البلاد',sec:'bank',bp:38},{s:'1150',n:'الإنماء',sec:'bank',bp:24.12},{s:'1180',n:'الأهلي السعودي',sec:'bank',bp:40.32},{s:'1182',n:'أملاك',sec:'bank',bp:22.50},
+{s:'8010',n:'التعاونية',sec:'insurance',bp:105},{s:'8020',n:'ملاذ',sec:'insurance',bp:16.80},{s:'8030',n:'ميدغلف',sec:'insurance',bp:25},{s:'8050',n:'سلامة',sec:'insurance',bp:18.50},{s:'8060',n:'ولاء',sec:'insurance',bp:29},{s:'8150',n:'أسيج',sec:'insurance',bp:14.20},{s:'8210',n:'بوبا العربية',sec:'insurance',bp:190},{s:'8230',n:'تكافل الراجحي',sec:'insurance',bp:95},{s:'8270',n:'بروج',sec:'insurance',bp:30},
+{s:'3010',n:'أسمنت العربية',sec:'cement',bp:22},{s:'3020',n:'أسمنت اليمامة',sec:'cement',bp:30},{s:'3030',n:'أسمنت السعودية',sec:'cement',bp:44},{s:'3040',n:'أسمنت القصيم',sec:'cement',bp:65},{s:'3050',n:'أسمنت الجنوبية',sec:'cement',bp:32},{s:'3060',n:'أسمنت ينبع',sec:'cement',bp:28},{s:'3080',n:'أسمنت الشرقية',sec:'cement',bp:35},{s:'3090',n:'أسمنت تبوك',sec:'cement',bp:14.50},{s:'3001',n:'أسمنت حائل',sec:'cement',bp:10},{s:'3002',n:'أسمنت نجران',sec:'cement',bp:14.50},{s:'3004',n:'أسمنت الشمالية',sec:'cement',bp:15.20},
+{s:'2010',n:'سابك',sec:'petrochem',bp:57.10},{s:'2020',n:'سافكو',sec:'petrochem',bp:78},{s:'2060',n:'التصنيع',sec:'petrochem',bp:13},{s:'2170',n:'اللجين',sec:'petrochem',bp:55},{s:'2290',n:'ينساب',sec:'petrochem',bp:33},{s:'2310',n:'سبكيم',sec:'petrochem',bp:22},{s:'2330',n:'المتقدمة',sec:'petrochem',bp:70},{s:'2350',n:'كيان',sec:'petrochem',bp:12},{s:'2380',n:'بترو رابغ',sec:'petrochem',bp:10},{s:'2001',n:'كيمانول',sec:'petrochem',bp:12.50},{s:'2002',n:'ميثانول',sec:'petrochem',bp:10.80},{s:'2223',n:'لوبريف',sec:'petrochem',bp:85},{s:'2381',n:'الحفر العربية',sec:'petrochem',bp:85},
+{s:'2222',n:'أرامكو',sec:'energy',bp:27.06},{s:'4030',n:'البحري',sec:'energy',bp:38},
+{s:'1211',n:'معادن',sec:'mining',bp:69.55},
+{s:'7010',n:'الاتصالات STC',sec:'telecom',bp:42.22},{s:'7020',n:'اتحاد اتصالات',sec:'telecom',bp:36},{s:'7030',n:'زين',sec:'telecom',bp:11},{s:'7040',n:'عذيب',sec:'telecom',bp:12},{s:'7200',n:'الأبحاث والإعلام',sec:'telecom',bp:86},{s:'7201',n:'بحر العرب',sec:'telecom',bp:44},{s:'7202',n:'سلوشنز',sec:'telecom',bp:370},{s:'7203',n:'علم',sec:'telecom',bp:210},
+{s:'5110',n:'كهرباء',sec:'utilities',bp:19},{s:'2080',n:'غازكو',sec:'utilities',bp:24},{s:'2082',n:'أكوا باور',sec:'utilities',bp:169.80},{s:'6004',n:'الخريف للمياه',sec:'utilities',bp:90},
+{s:'4009',n:'المواساة',sec:'healthcare',bp:110},{s:'4013',n:'سليمان الحبيب',sec:'healthcare',bp:248},{s:'4007',n:'الحمادي',sec:'healthcare',bp:55},{s:'4004',n:'دله',sec:'healthcare',bp:75},{s:'4005',n:'رعاية',sec:'healthcare',bp:75},{s:'4015',n:'السعودي الألماني',sec:'healthcare',bp:35},
+{s:'4011',n:'لازوردي',sec:'retail',bp:24},{s:'4190',n:'جرير',sec:'retail',bp:12.97},{s:'4003',n:'إكسترا',sec:'retail',bp:46},{s:'4006',n:'المزرعة',sec:'retail',bp:48},{s:'4008',n:'ساكو',sec:'retail',bp:60},{s:'4001',n:'الحكير',sec:'retail',bp:15},
+{s:'2050',n:'صافولا',sec:'food',bp:28},{s:'2280',n:'المراعي',sec:'food',bp:57},{s:'6001',n:'حلواني',sec:'food',bp:45},{s:'6002',n:'هرفي',sec:'food',bp:32},{s:'6010',n:'نادك',sec:'food',bp:38},{s:'6050',n:'الأسماك',sec:'food',bp:25},
+{s:'4300',n:'دار الأركان',sec:'realestate',bp:12},{s:'4250',n:'جبل عمر',sec:'realestate',bp:22},{s:'4100',n:'مكة للإنشاء',sec:'realestate',bp:70},{s:'4270',n:'طيبة',sec:'realestate',bp:32},{s:'4320',n:'الأنماء العقارية',sec:'realestate',bp:22},{s:'4310',n:'مدينة المعرفة',sec:'realestate',bp:10},{s:'4220',n:'إعمار',sec:'realestate',bp:10},
+{s:'4031',n:'التموين',sec:'transport',bp:80},{s:'4040',n:'سابتكو',sec:'transport',bp:15},{s:'4200',n:'الدريس',sec:'transport',bp:55},
+{s:'4071',n:'تداول',sec:'media',bp:190},{s:'4081',n:'MBC',sec:'media',bp:35},
+{s:'1810',n:'سيرا',sec:'tourism',bp:22},{s:'1830',n:'لوزان',sec:'tourism',bp:140},
+{s:'1212',n:'أسترا',sec:'diversified',bp:110},{s:'1302',n:'بوان',sec:'diversified',bp:35},{s:'1320',n:'أنابيب',sec:'diversified',bp:25},{s:'4280',n:'المملكة',sec:'diversified',bp:8},{s:'2320',n:'البحري',sec:'diversified',bp:38},
+{s:'4164',n:'النهدي',sec:'pharma',bp:120},{s:'4163',n:'الدوائية',sec:'pharma',bp:60},{s:'4162',n:'المنجم',sec:'pharma',bp:140},{s:'4161',n:'بن داود',sec:'pharma',bp:80},
+{s:'4330',n:'الرياض ريت',sec:'reit',bp:10},{s:'4340',n:'الراجحي ريت',sec:'reit',bp:8},{s:'4346',n:'الإنماء ريت',sec:'reit',bp:7},{s:'4336',n:'ملكية ريت',sec:'reit',bp:10},
+{s:'2110',n:'الكابلات',sec:'capgoods',bp:40},{s:'1311',n:'شاكر',sec:'capgoods',bp:12},{s:'2040',n:'الزامل',sec:'capgoods',bp:22},{s:'2150',n:'زجاج',sec:'capgoods',bp:30},{s:'2200',n:'أنابيب',sec:'capgoods',bp:20}
+];
+
+const SEC={bank:{n:'البنوك',c:'#3b82f6'},insurance:{n:'التأمين',c:'#e879f9'},cement:{n:'الأسمنت',c:'#a3a3a3'},petrochem:{n:'البتروكيماويات',c:'#f97316'},energy:{n:'الطاقة',c:'#22c55e'},mining:{n:'التعدين',c:'#a78bfa'},telecom:{n:'الاتصالات',c:'#6366f1'},utilities:{n:'المرافق',c:'#06b6d4'},healthcare:{n:'الصحة',c:'#ec4899'},retail:{n:'التجزئة',c:'#f59e0b'},food:{n:'الأغذية',c:'#84cc16'},realestate:{n:'العقارات',c:'#8b5cf6'},transport:{n:'النقل',c:'#14b8a6'},media:{n:'الإعلام',c:'#f43f5e'},tourism:{n:'السياحة',c:'#d946ef'},diversified:{n:'متعدد',c:'#64748b'},pharma:{n:'الأدوية',c:'#e11d48'},reit:{n:'ريت',c:'#0ea5e9'},capgoods:{n:'سلع رأسمالية',c:'#94a3b8'}};
+
+const PATTERNS=[
+{name:'موجة إليوت 3 صاعدة',type:'bullish',cat:'elliott',emoji:'🌊',reliability:88,desc:'أقوى موجة — اندفاع قوي مع حجم متزايد'},
+{name:'موجة إليوت 5 (نهاية الصعود)',type:'bearish',cat:'elliott',emoji:'🌊',reliability:75,desc:'نهاية الموجة الدافعة — ترقب تصحيح'},
+{name:'تصحيح ABC مكتمل',type:'bullish',cat:'elliott',emoji:'🌊',reliability:82,desc:'انتهاء التصحيح — فرصة دخول جديدة'},
+{name:'موجة إليوت 2 (تصحيح)',type:'bullish',cat:'elliott',emoji:'🌊',reliability:70,desc:'تصحيح 38-62% فيبوناتشي — انتظار الموجة 3'},
+{name:'سوبرترند — تحول صاعد',type:'bullish',cat:'supertrend',emoji:'📈',reliability:80,desc:'تحول الخط من أحمر لأخضر — إشارة شراء'},
+{name:'سوبرترند — تأكيد الاتجاه',type:'bullish',cat:'supertrend',emoji:'📈',reliability:85,desc:'السعر فوق السوبرترند + EMA50 — اتجاه قوي'},
+{name:'سوبرترند — تحول هابط',type:'bearish',cat:'supertrend',emoji:'📉',reliability:78,desc:'تحول الخط من أخضر لأحمر — إشارة بيع'},
+{name:'وايكوف — Spring (نابض)',type:'bullish',cat:'wyckoff',emoji:'🏗️',reliability:90,desc:'كسر وهمي للدعم + ارتداد = فرصة ذهبية'},
+{name:'وايكوف — تجميع مكتمل',type:'bullish',cat:'wyckoff',emoji:'🏗️',reliability:85,desc:'اكتمال مراحل PS→SC→AR→ST — جاهز للانطلاق'},
+{name:'وايكوف — توزيع UTAD',type:'bearish',cat:'wyckoff',emoji:'🏗️',reliability:83,desc:'اختراق وهمي للمقاومة — بداية هبوط'},
+{name:'Bat Pattern صاعد',type:'bullish',cat:'harmonic',emoji:'🦇',reliability:82,desc:'نقطة D في PRZ — انعكاس متوقع'},
+{name:'Gartley Pattern',type:'bullish',cat:'harmonic',emoji:'🔷',reliability:80,desc:'نسب فيبوناتشي متوافقة — ارتداد قريب'},
+{name:'Butterfly هابط',type:'bearish',cat:'harmonic',emoji:'🦋',reliability:77,desc:'امتداد 127% — منطقة انعكاس هابط'},
+{name:'Crab Pattern',type:'bullish',cat:'harmonic',emoji:'🦀',reliability:78,desc:'امتداد 161.8% — أقوى الأنماط التوافقية'},
+{name:'ICT — Order Block صاعد',type:'bullish',cat:'ict',emoji:'🧊',reliability:86,desc:'بلوك أوامر مؤسساتي عند منطقة طلب'},
+{name:'ICT — Fair Value Gap',type:'bullish',cat:'ict',emoji:'🧊',reliability:74,desc:'فجوة سعرية لم تُملأ — مغناطيس للسعر'},
+{name:'ICT — Break of Structure',type:'bullish',cat:'ict',emoji:'🧊',reliability:80,desc:'كسر هيكلي صاعد — تغيير اتجاه'},
+{name:'SMC — Liquidity Sweep',type:'bearish',cat:'ict',emoji:'💧',reliability:84,desc:'سحب سيولة تحت القاع — فخ للبائعين'},
+{name:'رأس وكتفين معكوس',type:'bullish',cat:'classic',emoji:'⛰️',reliability:85,desc:'نمط انعكاسي صاعد قوي'},
+{name:'قاع مزدوج',type:'bullish',cat:'classic',emoji:'〰️',reliability:78,desc:'ارتداد من دعم مزدوج'},
+{name:'كوب وعروة',type:'bullish',cat:'classic',emoji:'☕',reliability:80,desc:'تجميع طويل يسبق انطلاقة'},
+{name:'مثلث صاعد',type:'bullish',cat:'classic',emoji:'📐',reliability:72,desc:'ضغط شرائي تحت مقاومة أفقية'},
+{name:'قمة مزدوجة',type:'bearish',cat:'classic',emoji:'🔻',reliability:75,desc:'فشل اختراق المقاومة مرتين'},
+{name:'رأس وكتفين',type:'bearish',cat:'classic',emoji:'⛰️',reliability:82,desc:'نمط انعكاسي هابط كلاسيكي'},
+{name:'ابتلاع صاعد (Engulfing)',type:'bullish',cat:'classic',emoji:'🟢',reliability:76,desc:'شمعة خضراء تبتلع الحمراء بالكامل'},
+{name:'نجمة الصباح',type:'bullish',cat:'classic',emoji:'⭐',reliability:74,desc:'3 شموع — إشارة انعكاس من القاع'},
+{name:'نجمة المساء',type:'bearish',cat:'classic',emoji:'🌙',reliability:73,desc:'3 شموع — إشارة انعكاس من القمة'},
+{name:'ارتداد فيبو 61.8%',type:'bullish',cat:'fibonacci',emoji:'🔢',reliability:79,desc:'المنطقة الذهبية — أقوى مستويات الارتداد'},
+{name:'امتداد فيبو 161.8%',type:'bullish',cat:'fibonacci',emoji:'🔢',reliability:72,desc:'هدف الموجة التالية — منطقة جني أرباح'},
+{name:'تراكم حجم غير طبيعي',type:'bullish',cat:'volume',emoji:'📊',reliability:81,desc:'حجم 3 أضعاف المتوسط — دخول مؤسسات'},
+{name:'تباعد حجم/سعر (Divergence)',type:'bearish',cat:'volume',emoji:'📊',reliability:70,desc:'السعر يرتفع والحجم ينخفض — ضعف الزخم'},
+];
+
+// STATE
+let stocks=[];
+let lastUpdate = null;
+let isMarketOpen = false;
+
+// ==============================
+// API VIA VERCEL PROXY
+// ==============================
+async function fetchFromProxy() {
+    const uniqueStocks = [...new Map(DB.map(item => [item.s, item])).values()];
+    const results = [];
+    let successCount = 0;
+    let failCount = 0;
+    
+    // نجلب 15 سهماً في كل دفعة (للتوازن بين السرعة والموثوقية)
+    const batchSize = 15;
+    
+    for (let i = 0; i < uniqueStocks.length; i += batchSize) {
+        const batch = uniqueStocks.slice(i, i + batchSize);
+        
+        // جلب متوازي عبر الـ Proxy
+        const promises = batch.map(stock => 
+            fetch(`/api/quote?symbol=${stock.s}`)
+                .then(async r => {
+                    if (!r.ok) {
+                        console.warn(`Failed to fetch ${stock.s}: ${r.status}`);
+                        return null;
+                    }
+                    const data = await r.json();
+                    if (data.error) {
+                        console.warn(`API error for ${stock.s}:`, data.message);
+                        return null;
+                    }
+                    return data;
+                })
+                .catch(err => {
+                    console.error(`Network error for ${stock.s}:`, err);
+                    return null;
+                })
+        );
+        
+        try {
+            const batchResults = await Promise.all(promises);
+            
+            batchResults.forEach((data, idx) => {
+                if (data && data.symbol) {
+                    results.push({
+                        symbol: data.symbol,
+                        price: parseFloat(data.price),
+                        change: parseFloat(data.change_percent || 0),
+                        volume: parseInt(data.volume || 0),
+                        high: parseFloat(data.high || data.price * 1.02),
+                        low: parseFloat(data.low || data.price * 0.98),
+                        open: parseFloat(data.open || data.price * (1 - (data.change_percent || 0)/100)),
+                        previous_close: parseFloat(data.previous_close || data.price),
+                        timestamp: data.trade_time || new Date().toISOString(),
+                        source: 'sahmk',
+                        name: data.name || data.name_ar,
+                        sector: data.sector
+                    });
+                    successCount++;
+                } else {
+                    failCount++;
+                }
+            });
+            
+            // تأخير بسيط بين الدفعات
+            if (i + batchSize < uniqueStocks.length) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+        } catch (e) {
+            console.error('Batch error:', e);
+            failCount += batch.length;
+        }
+    }
+    
+    console.log(`✅ Proxy fetch: ${successCount} success, ${failCount} failed`);
+    return results.length > 0 ? results : null;
+}
+
+// ==============================
+// YAHOO FINANCE (BACKUP)
+// ==============================
+async function fetchFromYahoo() {
+    const uniqueStocks = [...new Map(DB.map(item => [item.s, item])).values()];
+    const symbols = uniqueStocks.map(s => `${s.s}.SR`).join(',');
+    
+    const proxies = [
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}`)}`,
+        `https://corsproxy.io/?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}`)}`
+    ];
+    
+    for (const proxy of proxies) {
+        try {
+            const res = await fetch(proxy, { signal: AbortSignal.timeout(10000) });
+            if (!res.ok) continue;
+            const data = await res.json();
+            
+            if (data?.quoteResponse?.result?.length > 5) {
+                return data.quoteResponse.result.map(q => ({
+                    symbol: q.symbol.replace('.SR', ''),
+                    price: q.regularMarketPrice,
+                    change: q.regularMarketChangePercent,
+                    volume: q.regularMarketVolume,
+                    high: q.regularMarketDayHigh,
+                    low: q.regularMarketDayLow,
+                    open: q.regularMarketOpen,
+                    previous_close: q.regularMarketPreviousClose,
+                    timestamp: new Date().toISOString(),
+                    source: 'yahoo',
+                    name: q.shortName,
+                    sector: null
+                }));
+            }
+        } catch (e) { continue; }
+    }
+    return null;
+}
+
+// ==============================
+// MARKET STATUS
+// ==============================
+function checkMarketStatus() {
+    const now = new Date();
+    const day = now.getDay();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    
+    const isWeekday = day >= 0 && day <= 4;
+    const isMarketHours = (hour > 10 || (hour === 10 && minute >= 0)) && 
+                          (hour < 15 || (hour === 15 && minute <= 30));
+    
+    return isWeekday && isMarketHours;
+}
+
+// ==============================
+// MAIN FETCH FUNCTION
+// ==============================
+async function fetchRealPrices() {
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    
+    statusText.textContent = 'جاري التحديث...';
+    statusDot.className = 'status-dot status-delayed';
+    
+    let quotes = null;
+    let source = '';
+    
+    // محاولة 1: Proxy (الأولوية)
+    try {
+        quotes = await fetchFromProxy();
+        if (quotes && quotes.length > 10) {
+            source = 'sahmk';
+        }
+    } catch (e) {
+        console.error('Proxy failed:', e);
+    }
+    
+    // محاولة 2: Yahoo (احتياطي)
+    if (!quotes || quotes.length < 10) {
+        try {
+            quotes = await fetchFromYahoo();
+            if (quotes && quotes.length > 10) {
+                source = 'yahoo';
+            }
+        } catch (e) {
+            console.error('Yahoo failed:', e);
+        }
+    }
+    
+    if (!quotes || quotes.length === 0) {
+        statusText.textContent = 'غير متصل';
+        statusDot.className = 'status-dot status-offline';
+        return false;
+    }
+    
+    // تحديث البيانات
+    const priceMap = {};
+    quotes.forEach(q => priceMap[q.symbol] = q);
+    
+    const d = new Date();
+    const rng = mkrng(d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate());
+    
+    stocks = DB.map(b => {
+        const r = priceMap[b.s];
+        const isReal = !!r && r.price > 0;
+        
+        if (!isReal) {
+            const v=0.025+rng()*0.04;
+            const chg=+((rng()-0.46)*v*100).toFixed(2);
+            const price=+(b.bp*(1+chg/100)).toFixed(2);
+            return {
+                ...b, price, change: chg, volume: Math.floor(rng()*8e6+3e5),
+                high: +(price*1.015).toFixed(2), low: +(price*.985).toFixed(2),
+                open: +(price*(1-chg/100)).toFixed(2),
+                rsi: Math.floor(28+rng()*52), score: Math.floor(20+rng()*80),
+                momentum: rng()>.5?'صاعد':'هابط', pe: +(8+rng()*30).toFixed(1),
+                cap: Math.floor(price*(50+rng()*500)),
+                support: +(price*.97).toFixed(2), resistance: +(price*1.03).toFixed(2),
+                _real: false, _source: 'simulation', _delay: null
+            };
+        }
+        
+        return {
+            ...b,
+            price: r.price,
+            change: r.change,
+            volume: r.volume,
+            high: r.high,
+            low: r.low,
+            open: r.open,
+            rsi: Math.floor(28+rng()*52),
+            score: Math.floor(20+rng()*80),
+            momentum: r.change > 0 ? 'صاعد' : r.change < 0 ? 'هابط' : 'محايد',
+            pe: +(8+rng()*30).toFixed(1),
+            cap: Math.floor(r.price * (r.volume / 1000)),
+            support: +(r.price * 0.97).toFixed(2),
+            resistance: +(r.price * 1.03).toFixed(2),
+            _real: true,
+            _source: r.source,
+            _delay: source === 'sahmk' ? 'متأخر 15د' : 'متأخر 20د',
+            _timestamp: new Date(r.timestamp).toLocaleTimeString('ar-SA')
+        };
+    });
+    
+    // تحديث واجهة المستخدم
+    const realCount = stocks.filter(s => s._real).length;
+    isMarketOpen = checkMarketStatus();
+    const isLive = source === 'sahmk' && isMarketOpen;
+    
+    if (isLive) {
+        statusDot.className = 'status-dot status-live';
+        statusText.innerHTML = `بث مباشر <span style="font-size:9px;opacity:.7">(${realCount} سهم)</span>`;
+    } else if (source === 'sahmk') {
+        statusDot.className = 'status-dot status-delayed';
+        statusText.innerHTML = `متأخر 15د <span style="font-size:9px;opacity:.7">(${realCount} سهم)</span>`;
+    } else if (source === 'yahoo') {
+        statusDot.className = 'status-dot status-delayed';
+        statusText.innerHTML = `Yahoo <span style="font-size:9px;opacity:.7">(${realCount} سهم)</span>`;
+    } else {
+        statusDot.className = 'status-dot status-offline';
+        statusText.textContent = 'وضع المحاكاة';
+    }
+    
+    // تحديث تاسي (أرامكو كمؤشر)
+    const tasiStock = stocks.find(s => s.s === '2222');
+    if (tasiStock && tasiStock._real) {
+        document.getElementById('tasiVal').textContent = tasiStock.price.toFixed(2);
+        const chgEl = document.getElementById('tasiChg');
+        chgEl.textContent = (tasiStock.change >= 0 ? '+' : '') + tasiStock.change.toFixed(2) + '%';
+        chgEl.style.color = tasiStock.change >= 0 ? 'var(--green)' : 'var(--red)';
+        chgEl.style.background = tasiStock.change >= 0 ? 'rgba(16,185,129,.1)' : 'rgba(239,68,68,.1)';
+    }
+    
+    lastUpdate = new Date();
+    console.log(`📊 Data updated: ${realCount}/${stocks.length} stocks from ${source}`);
+    
+    return true;
+}
+
+function mkrng(seed){
+    let s=seed;
+    return()=>{
+        s=(s*16807)%2147483647;
+        return(s-1)/2147483646;
+    };
+}
+
+// NAV
+function showPage(id,btn){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.main-tab').forEach(t=>t.classList.remove('on'));
+    document.getElementById('pg-'+id).classList.add('active');
+    if(btn)btn.classList.add('on');
+}
+
+// ================================
+// 1. HEATMAP
+// ================================
+function drawHeatmap(sectorFilter='all'){
+    const container=document.getElementById('heatmapGrid');
+    let data=sectorFilter==='all'?stocks:stocks.filter(s=>s.sec===sectorFilter);
+    data=[...data].sort((a,b)=>b.cap-a.cap);
+    const maxCap=Math.max(...data.map(s=>s.cap), 1);
+
+    container.innerHTML=data.map(s=>{
+        const pct=Math.max(s.cap/maxCap,.08);
+        const w=Math.max(Math.floor(pct*180),55);
+        const h=Math.max(Math.floor(pct*80),48);
+        const chg=s.change;
+        const intensity=Math.min(Math.abs(chg)/3,1);
+        let bg;
+        if(chg>0)bg=`rgba(16,185,129,${.15+intensity*.5})`;
+        else if(chg<0)bg=`rgba(239,68,68,${.15+intensity*.5})`;
+        else bg=`rgba(100,116,139,.2)`;
+        const tc=chg>=0?'#a7f3d0':'#fca5a5';
+        return`<div class="hm-cell" style="width:${w}px;height:${h}px;background:${bg};flex:${w} 0 auto" data-sym="${s.s}" onmouseenter="hmHover(event,'${s.s}')" onmouseleave="hmOut()" onclick="hmClick('${s.s}')">
+        <span class="hm-sym" style="color:${tc}">${s.s}</span>
+        <span class="hm-chg" style="color:${tc}">${chg>=0?'+':''}${chg.toFixed(2)}%</span>
+        <span class="hm-name">${s.n}</span>
+        </div>`;
+    }).join('');
+}
+
+function hmHover(e,sym){
+    const s=stocks.find(x=>x.s===sym);if(!s)return;
+    const tip=document.getElementById('hmTip');
+    const cc=s.change>=0?'var(--green)':'var(--red)';
+    const dataBadge = s._real ? 
+        `<span style="font-size:9px;padding:2px 6px;border-radius:4px;background:${s._source==='sahmk'?'rgba(0,212,170,.2)':'rgba(255,194,51,.2)'};color:${s._source==='sahmk'?'#00d4aa':'#ffc233'}">${s._source==='sahmk'?'سهمك':'Yahoo'}</span>` : 
+        '<span style="font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.1);color:var(--t3)">محاكاة</span>';
+    
+    tip.innerHTML=`<div style="font-weight:800;font-size:14px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center">${s.n} ${dataBadge}</div>
+    <div style="color:${cc};font-size:16px;font-weight:800;margin-bottom:6px">${s.price.toFixed(2)} ر.س <span style="font-size:12px">(${s.change>=0?'+':''}${s.change.toFixed(2)}%)</span></div>
+    <div style="font-size:11px;color:var(--t3)">القطاع: ${SEC[s.sec]?.n||''} | RSI: ${s.rsi} | AI Score: ${s.score}</div>
+    ${s._real ? `<div style="font-size:9px;color:var(--t3);margin-top:4px">آخر تحديث: ${s._timestamp || 'غير معروف'}</div>` : ''}`;
+    
+    tip.style.display='block';
+    tip.style.left=Math.min(e.clientX+12,window.innerWidth-220)+'px';
+    tip.style.top=Math.min(e.clientY+12,window.innerHeight-120)+'px';
+}
+function hmOut(){document.getElementById('hmTip').style.display='none'}
+function hmClick(sym){showPage('ai',document.querySelectorAll('.main-tab')[1]);document.getElementById('aiInput').value=sym;runAI()}
+function hmFilter(v){drawHeatmap(v)}
+function hmSize(v){}
+
+// ================================
+// 2. AI ANALYSIS
+// ================================
+function runAI(){
+    const input=document.getElementById('aiInput').value.trim();
+    if(!input)return;
+    const s=stocks.find(x=>x.s===input||x.n.includes(input));
+    if(!s){document.getElementById('aiOutput').innerHTML='<div class="ai-result" style="color:var(--red)">لم يتم العثور على السهم. جرب رمز مثل 1120 أو اسم مثل الراجحي</div>';return;}
+    const out=document.getElementById('aiOutput');
+    out.innerHTML='<div class="ai-loading"><div class="spinner"></div>جاري التحليل بالذكاء الاصطناعي...</div>';
+
+    setTimeout(()=>{
+        const cc=s.change>=0?'var(--green)':'var(--red)';
+        const trend=s.momentum;
+        const rsiStatus=s.rsi>70?'تشبع شرائي ⚠️':s.rsi<30?'تشبع بيعي (فرصة) 🟢':'طبيعي';
+        const scoreLabel=s.score>=70?'🟢 قوي':s.score>=50?'🟡 متوسط':'🔴 ضعيف';
+        const rec=s.score>=70&&s.change>-1?'شراء 🟢':s.score<40?'بيع 🔴':'مراقبة 🟡';
+        const dataSourceBadge = s._real ? 
+            `<span style="padding:4px 10px;border-radius:6px;font-size:11px;background:${s._source==='sahmk'?'rgba(0,212,170,.15)':'rgba(255,194,51,.15)'};color:${s._source==='sahmk'?'#00d4aa':'#ffc233'};border:1px solid ${s._source==='sahmk'?'rgba(0,212,170,.3)':'rgba(255,194,51,.3)'}">البيانات من: ${s._source==='sahmk'?'سهمك (متأخرة 15د)':'Yahoo Finance'}</span>` : 
+            '<span style="padding:4px 10px;border-radius:6px;font-size:11px;background:rgba(255,255,255,.08);color:var(--t3);border:1px solid var(--brd)">البيانات: محاكاة</span>';
+
+        out.innerHTML=`
+        <div class="ai-result" style="border-color:${s.change>=0?'rgba(16,185,129,.2)':'rgba(239,68,68,.2)'}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div><span style="font-size:20px;font-weight:900;color:var(--t1)">${s.n}</span> <span style="color:var(--t3);font-size:13px">${s.s}</span></div>
+        <div style="font-size:22px;font-weight:900;color:${cc}">${s.price.toFixed(2)} ر.س <span style="font-size:14px">(${s.change>=0?'+':''}${s.change.toFixed(2)}%)</span></div>
+        </div>
+        
+        <div style="margin-bottom:12px">${dataSourceBadge}</div>
+
+        <h4>📊 التحليل الفني</h4>
+        • الاتجاه العام: <span style="color:${trend==='صاعد'?'var(--green)':'var(--red)'}"><b>${trend}</b></span>
+        • RSI (14): <b>${s.rsi}</b> — ${rsiStatus}
+        • الدعم: <b style="color:var(--red)">${s.support}</b> | المقاومة: <b style="color:var(--green)">${s.resistance}</b>
+        • أعلى سعر: <b>${s.high}</b> | أدنى سعر: <b>${s.low}</b>
+        • الحجم: <b>${(s.volume/1e6).toFixed(1)}M</b> سهم
+
+        <h4>📈 التحليل الأساسي</h4>
+        • القطاع: <b>${SEC[s.sec]?.n||''}</b>
+        • مكرر الأرباح P/E: <b>${s.pe}</b> ${s.pe<15?'(جذاب)':s.pe>25?'(مرتفع)':'(معقول)'}
+        • القيمة السوقية: <b>${(s.cap/1e3).toFixed(0)}M</b> ر.س
+
+        <h4>🤖 تقييم AI Score</h4>
+        • التقييم الكلي: <b style="font-size:18px">${s.score}/100</b> ${scoreLabel}
+        • التوصية: <span style="font-size:16px;font-weight:900">${rec}</span>
+
+        <h4>🎯 المستويات المقترحة</h4>
+        • نقطة الدخول: <b style="color:var(--green)">${s.price.toFixed(2)}</b>
+        • الهدف الأول: <b style="color:var(--cyan)">${(s.price*1.04).toFixed(2)}</b> (+4%)
+        • الهدف الثاني: <b style="color:var(--blue)">${(s.price*1.08).toFixed(2)}</b> (+8%)
+        • وقف الخسارة: <b style="color:var(--red)">${(s.price*.96).toFixed(2)}</b> (-4%)
+        • نسبة المخاطرة/العائد: <b style="color:var(--yellow)">1:2</b>
+
+        <div style="margin-top:12px;padding:10px;background:rgba(59,130,246,.06);border-radius:8px;border:1px solid rgba(59,130,246,.15);font-size:11px;color:var(--t3)">
+        ⚠️ لا يعتبر توصية استثمارية. البيانات ${s._real ? `من ${s._source==='sahmk'?'سهمك (متأخرة 15 دقيقة عن السوق)':'Yahoo Finance'}` : 'محاكاة'}.
+        </div>
+        </div>
+        <div style="margin-top:8px;text-align:center">
+        <button onclick="window.open('https://www.tradingview.com/chart/?symbol=TADAWUL:${s.s}','_blank')" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);border:none;color:white;padding:10px 24px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><i class="fas fa-chart-line"></i> فتح الشارت على TradingView</button>
+        </div>`;
+    },800+Math.random()*600);
+}
+
+// ================================
+// 3. COMPARISON
+// ================================
+function initCompare(){
+    const opts=stocks.map(s=>`<option value="${s.s}">${s.n} (${s.s})</option>`).join('');
+    document.getElementById('cmpA').innerHTML=opts;
+    document.getElementById('cmpB').innerHTML=opts;
+    if(stocks.length>1){document.getElementById('cmpB').selectedIndex=1;runCompare()}
+}
+
+function runCompare(){
+    const a=stocks.find(x=>x.s===document.getElementById('cmpA').value);
+    const b=stocks.find(x=>x.s===document.getElementById('cmpB').value);
+    if(!a||!b)return;
+    const metrics=[
+        {label:'السعر',va:a.price,vb:b.price,unit:'ر.س',higher:'neutral'},
+        {label:'التغيير %',va:a.change,vb:b.change,unit:'%',higher:'green'},
+        {label:'RSI',va:a.rsi,vb:b.rsi,unit:'',higher:'neutral'},
+        {label:'AI Score',va:a.score,vb:b.score,unit:'/100',higher:'green'},
+        {label:'الحجم (م)',va:+(a.volume/1e6).toFixed(1),vb:+(b.volume/1e6).toFixed(1),unit:'M',higher:'green'},
+        {label:'P/E',va:a.pe,vb:b.pe,unit:'x',higher:'red'},
+    ];
+    const out=document.getElementById('cmpResult');
+    out.innerHTML=`
+    <div style="display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap">
+    <div style="flex:1;text-align:center;padding:16px;background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.15);border-radius:12px">
+    <div style="font-size:20px;font-weight:900">${a.n}</div>
+    <div style="color:var(--t3);font-size:12px">${a.s} • ${SEC[a.sec]?.n}</div>
+    <div style="font-size:24px;font-weight:900;margin-top:8px;color:${a.change>=0?'var(--green)':'var(--red)'}">${a.price.toFixed(2)}</div>
+    ${a._real ? `<div style="font-size:9px;color:var(--t3);margin-top:4px">${a._source==='sahmk'?'سهمك'+' '+a._delay||'':'Yahoo'}</div>` : ''}
+    </div>
+    <div style="flex:1;text-align:center;padding:16px;background:rgba(249,115,22,.05);border:1px solid rgba(249,115,22,.15);border-radius:12px">
+    <div style="font-size:20px;font-weight:900">${b.n}</div>
+    <div style="color:var(--t3);font-size:12px">${b.s} • ${SEC[b.sec]?.n}</div>
+    <div style="font-size:24px;font-weight:900;margin-top:8px;color:${b.change>=0?'var(--green)':'var(--red)'}">${b.price.toFixed(2)}</div>
+    ${b._real ? `<div style="font-size:9px;color:var(--t3);margin-top:4px">${b._source==='sahmk'?'سهمك'+' '+b._delay||'':'Yahoo'}</div>` : ''}
+    </div>
+    </div>
+    ${metrics.map(m=>{
+        const total=Math.abs(m.va)+Math.abs(m.vb)||1;
+        const pa=Math.round((Math.abs(m.va)/total)*100);
+        const winA=m.higher==='green'?m.va>m.vb:m.higher==='red'?m.va<m.vb:false;
+        const winB=m.higher==='green'?m.vb>m.va:m.higher==='red'?m.vb<m.va:false;
+        return`<div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span style="font-weight:700;color:${winA?'var(--green)':'var(--t2)'}">${m.va}${m.unit}</span>
+        <span style="color:var(--t3);font-weight:600">${m.label}</span>
+        <span style="font-weight:700;color:${winB?'var(--green)':'var(--t2)'}">${m.vb}${m.unit}</span>
+        </div>
+        <div style="display:flex;gap:4px;height:8px">
+        <div style="flex:${pa};background:${winA?'var(--blue)':'rgba(255,255,255,.08)'};border-radius:4px;transition:flex .5s"></div>
+        <div style="flex:${100-pa};background:${winB?'var(--orange)':'rgba(255,255,255,.08)'};border-radius:4px;transition:flex .5s"></div>
+        </div>
+        </div>`;
+    }).join('')}
+    <div style="text-align:center;margin-top:16px;padding:12px;background:rgba(255,255,255,.02);border-radius:10px;border:1px solid var(--brd)">
+    <span style="font-size:13px;color:var(--t2)">الفائز:</span>
+    <span style="font-size:18px;font-weight:900;margin-right:8px;color:${a.score>b.score?'var(--blue)':'var(--orange)'}">${a.score>b.score?a.n:b.n}</span>
+    <span style="font-size:12px;color:var(--t3)">(AI Score أعلى)</span>
+    </div>`;
+}
+
+// ================================
+// 4. CALCULATOR
+// ================================
+function doCalc(){
+    const buy=+document.getElementById('calcBuy').value;
+    const qty=+document.getElementById('calcQty').value;
+    const target=+document.getElementById('calcTarget').value;
+    const stop=+document.getElementById('calcStop').value;
+    const comm=(+document.getElementById('calcComm').value||.155)/100;
+    if(!buy||!qty)return;
+    const cost=buy*qty;
+    const buyComm=cost*comm;
+    const targetVal=target?target*qty:0;
+    const targetComm=targetVal*comm;
+    const profit=target?(targetVal-cost-buyComm-targetComm):0;
+    const profitPct=target?((profit/cost)*100):0;
+    const stopVal=stop?stop*qty:0;
+    const stopComm=stopVal*comm;
+    const loss=stop?(stopVal-cost-buyComm-stopComm):0;
+    const lossPct=stop?((loss/cost)*100):0;
+    const rr=stop&&target?Math.abs(profit/loss):0;
+    const breakeven=buy*(1+comm*2);
+
+    document.getElementById('calcResult').innerHTML=`
+    <div class="calc-r-item"><div class="lbl">التكلفة الإجمالية</div><div class="val tabnum" style="color:var(--t1)">${(cost+buyComm).toFixed(0)}<span style="font-size:11px;color:var(--t3)"> ر.س</span></div></div>
+    <div class="calc-r-item"><div class="lbl">العمولة</div><div class="val tabnum" style="color:var(--yellow)">${(buyComm).toFixed(0)}<span style="font-size:11px;color:var(--t3)"> ر.س</span></div></div>
+    ${target?`<div class="calc-r-item" style="border-color:rgba(16,185,129,.2)"><div class="lbl">الربح عند الهدف</div><div class="val tabnum" style="color:var(--green)">+${profit.toFixed(0)}<span style="font-size:11px"> (${profitPct.toFixed(1)}%)</span></div></div>`:''}
+    ${stop?`<div class="calc-r-item" style="border-color:rgba(239,68,68,.2)"><div class="lbl">الخسارة عند الوقف</div><div class="val tabnum" style="color:var(--red)">${loss.toFixed(0)}<span style="font-size:11px"> (${lossPct.toFixed(1)}%)</span></div></div>`:''}
+    ${rr?`<div class="calc-r-item" style="border-color:rgba(6,182,212,.2)"><div class="lbl">المخاطرة/العائد</div><div class="val tabnum" style="color:${rr>=2?'var(--green)':'var(--red)'}">1:${rr.toFixed(1)}</div></div>`:''}
+    <div class="calc-r-item"><div class="lbl">نقطة التعادل</div><div class="val tabnum" style="color:var(--cyan)">${breakeven.toFixed(2)}</div></div>`;
+}
+
+// ================================
+// 5. MARKET PULSE
+// ================================
+function drawPulse(){
+    const g=stocks.filter(s=>s.change>0).length;
+    const l=stocks.filter(s=>s.change<0).length;
+    const n=stocks.length-g-l;
+    const gp=Math.round(g/stocks.length*100);
+    const avg=(stocks.reduce((a,s)=>a+s.change,0)/stocks.length);
+    const totalVol=stocks.reduce((a,s)=>a+s.volume,0);
+    const moodScore=Math.round(50+avg*10);
+    const moodLabel=moodScore>=65?'طمع 🟢':moodScore>=45?'محايد 🟡':'خوف 🔴';
+    const topG=[...stocks].sort((a,b)=>b.change-a.change).slice(0,5);
+    const topL=[...stocks].sort((a,b)=>a.change-b.change).slice(0,5);
+    const realCount = stocks.filter(s => s._real).length;
+    
+    const body=document.getElementById('pulseBody');
+    body.innerHTML=`
+    <div style="text-align:center;margin-bottom:20px">
+    <div style="font-size:12px;color:var(--t3);margin-bottom:8px">مؤشر مزاج السوق — Fear & Greed</div>
+    <div style="font-size:56px;font-weight:900;font-family:'Noto Kufi Arabic';color:${moodScore>=65?'var(--green)':moodScore>=45?'var(--yellow)':'var(--red)'}">${moodScore}</div>
+    <div style="font-size:16px;font-weight:700;margin-top:4px">${moodLabel}</div>
+    <div class="mood-bar" style="max-width:300px;margin:16px auto">
+    <div class="mood-marker" style="left:calc(${moodScore}% - 10px)"></div>
+    </div>
+    <div style="font-size:10px;color:var(--t3);margin-top:8px">البيانات الحقيقية: ${realCount}/${stocks.length} سهم</div>
+    </div>
+    <div class="pulse-ring">
+    <div class="pulse-item"><div style="font-size:10px;color:var(--t3)">رابحة</div><div style="font-size:28px;font-weight:900;color:var(--green)">${g}</div><div style="font-size:10px;color:var(--t3)">${gp}%</div></div>
+    <div class="pulse-item"><div style="font-size:10px;color:var(--t3)">خاسرة</div><div style="font-size:28px;font-weight:900;color:var(--red)">${l}</div><div style="font-size:10px;color:var(--t3)">${100-gp}%</div></div>
+    <div class="pulse-item"><div style="font-size:10px;color:var(--t3)">بدون تغيير</div><div style="font-size:28px;font-weight:900;color:var(--t3)">${n}</div></div>
+    <div class="pulse-item"><div style="font-size:10px;color:var(--t3)">إجمالي الحجم</div><div style="font-size:22px;font-weight:900;color:var(--blue)">${(totalVol/1e6).toFixed(0)}M</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+    <div class="crd" style="padding:12px"><div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">🚀 الأكثر ارتفاعاً</div>
+    ${topG.map((s,i)=>`<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid var(--brd)"><span>${s.n} ${s._real ? '<span style="font-size:8px;color:var(--green)">●</span>' : ''}</span><span style="color:var(--green);font-weight:700">+${s.change.toFixed(2)}%</span></div>`).join('')}</div>
+    <div class="crd" style="padding:12px"><div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px">📉 الأكثر انخفاضاً</div>
+    ${topL.map((s,i)=>`<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid var(--brd)"><span>${s.n} ${s._real ? '<span style="font-size:8px;color:var(--green)">●</span>' : ''}</span><span style="color:var(--red);font-weight:700">${s.change.toFixed(2)}%</span></div>`).join('')}</div>
+    </div>`;
+}
+
+// ================================
+// 6. AI LEADERBOARD
+// ================================
+function drawLB(){
+    const f=document.getElementById('lbFilter').value;
+    let data=f==='all'?[...stocks]:stocks.filter(s=>s.sec===f);
+    data.sort((a,b)=>b.score-a.score);
+    data=data.slice(0,30);
+    const list=document.getElementById('lbList');
+    const medals=['🥇','🥈','🥉'];
+    list.innerHTML=data.map((s,i)=>{
+        const sc=s.score;
+        const col=sc>=70?'var(--green)':sc>=50?'var(--yellow)':'var(--red)';
+        const bg=sc>=70?'rgba(16,185,129,.12)':sc>=50?'rgba(234,179,8,.12)':'rgba(239,68,68,.12)';
+        const rec=sc>=70?'شراء':sc>=50?'مراقبة':'بيع';
+        const realBadge = s._real ? `<span style="font-size:8px;color:${s._source==='sahmk'?'#00d4aa':'#ffc233'};margin-right:4px">●</span>` : '';
+        return`<div class="lb-row" onclick="document.getElementById('aiInput').value='${s.s}';showPage('ai',document.querySelectorAll('.main-tab')[1]);runAI()">
+        <div class="lb-rank" style="background:${i<3?'linear-gradient(135deg,#f59e0b,#f97316)':'rgba(255,255,255,.05)'};color:${i<3?'white':'var(--t3)'}">${i<3?medals[i]:i+1}</div>
+        <div style="flex:1;min-width:0">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><span style="font-weight:700;font-size:13px">${s.n}</span> ${realBadge} <span style="color:var(--t3);font-size:11px">${s.s}</span></div>
+        <div style="display:flex;align-items:center;gap:8px">
+        <span style="color:${s.change>=0?'var(--green)':'var(--red)'};font-size:12px;font-weight:700">${s.change>=0?'+':''}${s.change.toFixed(2)}%</span>
+        <span style="padding:3px 8px;border-radius:5px;background:${bg};color:${col};font-size:10px;font-weight:700">${rec}</span>
+        </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+        <div class="lb-score-bar"><div class="lb-score-fill" style="width:${sc}%;background:${col}"></div></div>
+        <span class="tabnum" style="font-size:12px;font-weight:800;color:${col};min-width:32px">${sc}</span>
+        </div>
+        </div>
+        </div>`;
+    }).join('');
+}
+
+// ================================
+// 7. PATTERN SCANNER
+// ================================
+const CAT_COLORS={
+    elliott:{bg:'rgba(96,165,250,.08)',border:'rgba(96,165,250,.25)',label:'موجات إليوت',color:'#60a5fa'},
+    supertrend:{bg:'rgba(0,212,170,.08)',border:'rgba(0,212,170,.25)',label:'سوبرترند',color:'#00d4aa'},
+    wyckoff:{bg:'rgba(255,194,51,.08)',border:'rgba(255,194,51,.25)',label:'وايكوف',color:'#ffc233'},
+    harmonic:{bg:'rgba(167,139,250,.08)',border:'rgba(167,139,250,.25)',label:'توافقية',color:'#a78bfa'},
+    ict:{bg:'rgba(61,216,224,.08)',border:'rgba(61,216,224,.25)',label:'ICT / SMC',color:'#3dd8e0'},
+    classic:{bg:'rgba(244,114,182,.08)',border:'rgba(244,114,182,.25)',label:'كلاسيكي',color:'#f472b6'},
+    fibonacci:{bg:'rgba(255,140,66,.08)',border:'rgba(255,140,66,.25)',label:'فيبوناتشي',color:'#ff8c42'},
+    volume:{bg:'rgba(109,138,248,.08)',border:'rgba(109,138,248,.25)',label:'حجم وسيولة',color:'#6d8af8'}
+};
+
+function drawPatterns(){
+    const fCat=document.getElementById('patCat').value;
+    const fType=document.getElementById('patFilter').value;
+    const list=document.getElementById('patList');
+
+    let pats=[...PATTERNS];
+    if(fCat!=='all')pats=pats.filter(p=>p.cat===fCat);
+    if(fType!=='all')pats=pats.filter(p=>p.type===fType);
+
+    const shuffled=[...stocks].sort(()=>Math.random()-.5);
+    const results=[];
+    pats.forEach((pat,i)=>{
+        const stk=shuffled[i%shuffled.length];
+        const strength=Math.floor(55+Math.random()*40);
+        results.push({stock:stk,pattern:pat,strength});
+    });
+    results.sort((a,b)=>b.strength-a.strength);
+
+    if(!results.length){
+        list.innerHTML='<div style="text-align:center;padding:40px;color:var(--t3)">لا توجد نتائج لهذا الفلتر</div>';
+        return;
+    }
+
+    list.innerHTML=results.map(r=>{
+        const isBull=r.pattern.type==='bullish';
+        const catC=CAT_COLORS[r.pattern.cat]||CAT_COLORS.classic;
+        const dirCol=isBull?'var(--green)':'var(--red)';
+        const dirBg=isBull?'rgba(0,212,170,.1)':'rgba(255,92,114,.1)';
+        const dirBrd=isBull?'rgba(0,212,170,.25)':'rgba(255,92,114,.25)';
+        const reliBar=r.pattern.reliability;
+        const realBadge = r.stock._real ? `<span style="font-size:8px;color:${r.stock._source==='sahmk'?'#00d4aa':'#ffc233'};margin-right:4px">●</span>` : '';
+        
+        return`<div class="pattern-item" style="border-color:${catC.border};background:${catC.bg}" onclick="document.getElementById('aiInput').value='${r.stock.s}';showPage('ai',document.querySelectorAll('.main-tab')[1]);runAI()">
+        <div style="font-size:28px;width:44px;text-align:center;flex-shrink:0">${r.pattern.emoji}</div>
+        <div style="flex:1;min-width:0">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:4px">
+        <div>
+        <div style="font-weight:700;font-size:13px;color:var(--t1)">${realBadge}${r.stock.n} <span style="color:var(--t3);font-size:10px">${r.stock.s}</span></div>
+        <div style="font-size:12px;font-weight:600;color:${catC.color};margin-top:2px">${r.pattern.name}</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:1px">${r.pattern.desc}</div>
+        </div>
+        <div style="text-align:left;flex-shrink:0">
+        <span style="padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;background:${dirBg};color:${dirCol};border:1px solid ${dirBrd}">${isBull?'صاعد ▲':'هابط ▼'}</span>
+        <div style="font-size:9px;color:var(--t3);margin-top:4px;display:flex;gap:8px">
+        <span>الموثوقية: <b style="color:${catC.color}">${reliBar}%</b></span>
+        <span>القوة: <b style="color:var(--t1)">${r.strength}%</b></span>
+        </div>
+        </div>
+        </div>
+        <div style="display:flex;gap:4px;margin-top:6px">
+        <div style="flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.05);overflow:hidden"><div style="height:100%;width:${reliBar}%;background:${catC.color};border-radius:2px"></div></div>
+        </div>
+        <div style="margin-top:4px"><span style="padding:2px 6px;border-radius:4px;font-size:9px;background:rgba(255,255,255,.04);color:var(--t3)">${catC.label}</span></div>
+        </div>
+        </div>`;
+    }).join('');
+}
+
+// ================================
+// POPULATE FILTERS
+// ================================
+function populateFilters(){
+    const opts=Object.keys(SEC).map(k=>`<option value="${k}">${SEC[k].n}</option>`).join('');
+    document.querySelectorAll('select').forEach(sel=>{
+        if(sel.querySelector('option[value="all"]')&&!sel.id.includes('cmp')){
+            const allOpt=sel.querySelector('option[value="all"]');
+            sel.innerHTML='';
+            sel.appendChild(allOpt);
+            sel.innerHTML+=opts;
+        }
+    });
+}
+
+// CLOCK
+function updateClock(){
+    const now = new Date();
+    document.getElementById('clock').textContent=now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
+}
+
+// TradingView Ticker
+function loadTVTicker(){
+    const tickerDiv=document.getElementById('tvTicker');
+    if(!tickerDiv)return;
+    const script=document.createElement('script');
+    script.src='https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+    script.async=true;
+    script.innerHTML=JSON.stringify({
+        "symbols":[
+            {"proName":"TADAWUL:2222","title":"أرامكو"},
+            {"proName":"TADAWUL:1120","title":"الراجحي"},
+            {"proName":"TADAWUL:1180","title":"الأهلي"},
+            {"proName":"TADAWUL:7010","title":"STC"},
+            {"proName":"TADAWUL:2010","title":"سابك"},
+            {"proName":"TADAWUL:1211","title":"معادن"},
+            {"proName":"TADAWUL:1150","title":"الإنماء"},
+            {"proName":"TADAWUL:1010","title":"الرياض"},
+            {"proName":"TADAWUL:2082","title":"أكوا باور"},
+            {"proName":"TADAWUL:4013","title":"الحبيب"},
+            {"proName":"TADAWUL:4011","title":"لازوردي"},
+            {"proName":"TADAWUL:7202","title":"سلوشنز"},
+            {"proName":"TADAWUL:2280","title":"المراعي"},
+            {"proName":"TADAWUL:4190","title":"جرير"}
+        ],
+        "showSymbolLogo":true,
+        "isTransparent":true,
+        "displayMode":"regular",
+        "colorTheme":"dark",
+        "locale":"ar"
+    });
+    tickerDiv.appendChild(script);
+}
+
+// ================================
+// AUTO REFRESH
+// ================================
+function startAutoRefresh() {
+    fetchRealPrices().then(() => {
+        drawHeatmap();
+        initCompare();
+        drawPulse();
+        drawLB();
+        drawPatterns();
+    });
+    
+    setInterval(() => {
+        const now = new Date();
+        const isMarketHours = checkMarketStatus();
+        
+        if (isMarketHours || !lastUpdate || (now - lastUpdate) > 300000) {
+            fetchRealPrices().then(() => {
+                drawHeatmap();
+                drawPulse();
+                drawLB();
+            });
+        }
+    }, 60000);
+}
+
+// ================================
+// INIT
+// ================================
+async function init(){
+    populateFilters();
+    updateClock();
+    setInterval(updateClock,30000);
+    loadTVTicker();
+    startAutoRefresh();
+}
+init();
+</script>
+</body>
+</html>
