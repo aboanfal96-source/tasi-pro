@@ -379,8 +379,8 @@ let stocks=[];
 let rng;
 function mkrng(seed){let s=seed;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
 
-// === FREE PRICE SOURCES (No API key needed) ===
-const CACHE_KEY='tasi_prices_v2';
+// === FREE PRICE SOURCES ===
+const CACHE_KEY='tasi_prices_v3';
 const CACHE_TTL=15*60*1000;
 
 function loadCache(){
@@ -406,7 +406,6 @@ el.style.cssText='font-size:9px;padding:3px 8px;border-radius:6px;border:1px sol
 return true;
 }
 
-// Show stale cache while loading
 if(cached&&Object.keys(cached.data).length>5){
 applyPrices(uniqueDB,cached.data);
 el.textContent='أسعار محفوظة — جاري التحديث...';
@@ -416,28 +415,20 @@ el.textContent='جاري تحميل الأسعار...';
 el.style.cssText='font-size:9px;padding:3px 8px;border-radius:6px;border:1px solid rgba(255,194,51,.3);background:rgba(255,194,51,.08);color:#ffc233';
 }
 
-// Fetch via Yahoo Finance through multiple CORS proxies
 const priceMap=cached?{...cached.data}:{};
-const batchSize=30;
 
+// Fetch in batches of 40 via Vercel proxy (server-side, no CORS)
+const batchSize=40;
 for(let i=0;i<uniqueDB.length;i+=batchSize){
 const batch=uniqueDB.slice(i,i+batchSize);
 const symbols=batch.map(b=>b.s+'.SR').join(',');
 
-const proxies=[
-`/api/sahmk?path=/quote/${symbols}`,
-`https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v7/finance/quote?symbols='+symbols)}`,
-`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent('https://query1.finance.yahoo.com/v7/finance/quote?symbols='+symbols)}`,
-`https://corsproxy.io/?url=${encodeURIComponent('https://query1.finance.yahoo.com/v7/finance/quote?symbols='+symbols)}`
-];
-
-for(const url of proxies){
 try{
-const r=await fetch(url,{signal:AbortSignal.timeout(12000)});
-if(!r.ok)continue;
+const r=await fetch(`/api/sahmk?symbols=${encodeURIComponent(symbols)}`,{signal:AbortSignal.timeout(15000)});
+if(r.ok){
 const data=await r.json();
 const quotes=data?.quoteResponse?.result;
-if(quotes&&quotes.length>0){
+if(quotes){
 quotes.forEach(q=>{
 const sym=(q.symbol||'').replace('.SR','');
 if(q.regularMarketPrice){
@@ -452,13 +443,12 @@ name:q.shortName||q.longName||''
 };
 }
 });
-break; // Success, skip other proxies
 }
-}catch(e){continue;}
 }
+}catch(e){console.log('Batch error:',e)}
 
 el.textContent=`تحميل ${Object.keys(priceMap).length}/${uniqueDB.length}...`;
-if(i+batchSize<uniqueDB.length)await new Promise(r=>setTimeout(r,500));
+if(i+batchSize<uniqueDB.length)await new Promise(r=>setTimeout(r,300));
 }
 
 const found=Object.keys(priceMap).length;
