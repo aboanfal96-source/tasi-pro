@@ -375,77 +375,75 @@ let lastUpdate = null;
 let isMarketOpen = false;
 
 // ==============================
-// API VIA VERCEL PROXY
+// FETCH FROM SAHMK VIA CORS PROXY
 // ==============================
-async function fetchFromProxy() {
+async function fetchFromSahmk() {
     const uniqueStocks = [...new Map(DB.map(item => [item.s, item])).values()];
     const results = [];
-    let successCount = 0;
-    let failCount = 0;
     
-    // نجلب 15 سهماً في كل دفعة (للتوازن بين السرعة والموثوقية)
-    const batchSize = 15;
+    // CORS Proxy للوصول لـ API سهمك
+    const CORS_PROXIES = [
+        'https://api.allorigins.win/raw?url=',
+        'https://api.codetabs.com/v1/proxy?quest=',
+        'https://corsproxy.io/?'
+    ];
     
-    for (let i = 0; i < uniqueStocks.length; i += batchSize) {
-        const batch = uniqueStocks.slice(i, i + batchSize);
-        
-        // جلب متوازي عبر الـ Proxy
-        const promises = batch.map(stock => 
-            fetch(`/api/quote?symbol=${stock.s}`)
-                .then(async r => {
-                    if (!r.ok) {
-                        console.warn(`Failed to fetch ${stock.s}: ${r.status}`);
-                        return null;
-                    }
-                    const data = await r.json();
-                    if (data.error) {
-                        console.warn(`API error for ${stock.s}:`, data.message);
-                        return null;
-                    }
-                    return data;
-                })
-                .catch(err => {
-                    console.error(`Network error for ${stock.s}:`, err);
-                    return null;
-                })
-        );
+    // جلب 30 سهماً للبدء
+    const batchSize = 30;
+    let proxyIndex = 0;
+    
+    for (let i = 0; i < Math.min(uniqueStocks.length, batchSize); i++) {
+        const stock = uniqueStocks[i];
+        const CORS_PROXY = CORS_PROXIES[proxyIndex % CORS_PROXIES.length];
         
         try {
-            const batchResults = await Promise.all(promises);
+            const targetUrl = `https://app.sahmk.sa/api/v1/quote/${stock.s}/`;
+            const proxyUrl = `${CORS_PROXY}${encodeURIComponent(targetUrl)}`;
             
-            batchResults.forEach((data, idx) => {
-                if (data && data.symbol) {
-                    results.push({
-                        symbol: data.symbol,
-                        price: parseFloat(data.price),
-                        change: parseFloat(data.change_percent || 0),
-                        volume: parseInt(data.volume || 0),
-                        high: parseFloat(data.high || data.price * 1.02),
-                        low: parseFloat(data.low || data.price * 0.98),
-                        open: parseFloat(data.open || data.price * (1 - (data.change_percent || 0)/100)),
-                        previous_close: parseFloat(data.previous_close || data.price),
-                        timestamp: data.trade_time || new Date().toISOString(),
-                        source: 'sahmk',
-                        name: data.name || data.name_ar,
-                        sector: data.sector
-                    });
-                    successCount++;
-                } else {
-                    failCount++;
-                }
+            const response = await fetch(proxyUrl, {
+                method: 'GET',
+                headers: {
+                    'X-API-Key': 'shmk_live_30015ec94962c7dd46acc73ebea15979d36e266f76ee8758',
+                    'Accept': 'application/json'
+                },
+                signal: AbortSignal.timeout(10000)
             });
             
-            // تأخير بسيط بين الدفعات
-            if (i + batchSize < uniqueStocks.length) {
-                await new Promise(resolve => setTimeout(resolve, 100));
+            if (!response.ok) {
+                if (response.status === 403 || response.status === 429) {
+                    proxyIndex++; // جرّب Proxy آخر
+                    i--; // أعد المحاولة
+                    continue;
+                }
+                console.warn(`❌ ${stock.s}: HTTP ${response.status}`);
+                continue;
+            }
+            
+            const data = await response.json();
+            
+            if (data && data.symbol && data.price) {
+                results.push({
+                    symbol: data.symbol,
+                    price: parseFloat(data.price),
+                    change: parseFloat(data.change_percent || 0),
+                    volume: parseInt(data.volume || 0),
+                    high: parseFloat(data.high || data.price * 1.02),
+                    low: parseFloat(data.low || data.price * 0.98),
+                    open: parseFloat(data.open || data.price * (1 - (data.change_percent || 0)/100)),
+                    timestamp: data.trade_time || new Date().toISOString(),
+                    source: 'sahmk'
+                });
+                console.log(`✅ ${stock.s}: ${data.price} (${data.change_percent}%)`);
             }
         } catch (e) {
-            console.error('Batch error:', e);
-            failCount += batch.length;
+            console.warn(`⚠️ ${stock.s}: ${e.message}`);
         }
+        
+        // تأخير 150ms بين كل طلب
+        await new Promise(resolve => setTimeout(resolve, 150));
     }
     
-    console.log(`✅ Proxy fetch: ${successCount} success, ${failCount} failed`);
+    console.log(`📊 Fetched ${results.length} stocks from SAHMK`);
     return results.length > 0 ? results : null;
 }
 
@@ -454,7 +452,7 @@ async function fetchFromProxy() {
 // ==============================
 async function fetchFromYahoo() {
     const uniqueStocks = [...new Map(DB.map(item => [item.s, item])).values()];
-    const symbols = uniqueStocks.map(s => `${s.s}.SR`).join(',');
+    const symbols = uniqueStocks.slice(0, 50).map(s => `${s.s}.SR`).join(',');
     
     const proxies = [
         `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}`)}`,
@@ -463,7 +461,7 @@ async function fetchFromYahoo() {
     
     for (const proxy of proxies) {
         try {
-            const res = await fetch(proxy, { signal: AbortSignal.timeout(10000) });
+            const res = await fetch(proxy, { signal: AbortSignal.timeout(15000) });
             if (!res.ok) continue;
             const data = await res.json();
             
@@ -517,21 +515,21 @@ async function fetchRealPrices() {
     let quotes = null;
     let source = '';
     
-    // محاولة 1: Proxy (الأولوية)
+    // محاولة 1: SAHMK عبر CORS Proxy
     try {
-        quotes = await fetchFromProxy();
-        if (quotes && quotes.length > 10) {
+        quotes = await fetchFromSahmk();
+        if (quotes && quotes.length > 5) {
             source = 'sahmk';
         }
     } catch (e) {
-        console.error('Proxy failed:', e);
+        console.error('SAHMK failed:', e);
     }
     
     // محاولة 2: Yahoo (احتياطي)
-    if (!quotes || quotes.length < 10) {
+    if (!quotes || quotes.length < 5) {
         try {
             quotes = await fetchFromYahoo();
-            if (quotes && quotes.length > 10) {
+            if (quotes && quotes.length > 5) {
                 source = 'yahoo';
             }
         } catch (e) {
