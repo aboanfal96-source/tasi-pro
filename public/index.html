@@ -379,65 +379,107 @@ let stocks=[];
 let rng;
 function mkrng(seed){let s=seed;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
 
-// === SAHMK API ===
-const SAHMK_KEY='shmk_live_30015ec94962c7dd46acc73ebea15979d36e266f76ee8758';
-const API='https://app.sahmk.sa/api/v1';
+// === FREE PRICE SOURCES (No API key needed) ===
+const CACHE_KEY='tasi_prices_v2';
+const CACHE_TTL=15*60*1000;
 
-async function sahmkFetch(path){
-// Try Vercel proxy first, then direct
-const urls=[`/api/sahmk?path=${encodeURIComponent(path)}`,`${API}${path}`];
-for(const url of urls){
-try{
-const opts=url.startsWith('/')?{}:{headers:{'X-API-Key':SAHMK_KEY}};
-const r=await fetch(url,{...opts,signal:AbortSignal.timeout(10000)});
-if(r.ok)return await r.json();
-}catch(e){continue;}
+function loadCache(){
+try{const c=JSON.parse(localStorage.getItem(CACHE_KEY));
+if(c&&Date.now()-c.ts<6*3600000)return c;return null;}catch(e){return null;}
 }
-return null;
+function saveCache(data){
+try{localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data}));}catch(e){}
 }
 
 async function fetchRealPrices(){
 const seen=new Set();
 const uniqueDB=DB.filter(b=>{if(seen.has(b.s))return false;seen.add(b.s);return true});
 const el=document.getElementById('dataSource');
+
+// Check fresh cache
+const cached=loadCache();
+if(cached&&Date.now()-cached.ts<CACHE_TTL&&Object.keys(cached.data).length>10){
+applyPrices(uniqueDB,cached.data);
+const age=Math.floor((Date.now()-cached.ts)/60000);
+el.textContent=`أسعار حقيقية (قبل ${age} دق) — ${Object.keys(cached.data).length} سهم ✅`;
+el.style.cssText='font-size:9px;padding:3px 8px;border-radius:6px;border:1px solid rgba(0,212,170,.3);background:rgba(0,212,170,.08);color:#00d4aa';
+return true;
+}
+
+// Show stale cache while loading
+if(cached&&Object.keys(cached.data).length>5){
+applyPrices(uniqueDB,cached.data);
+el.textContent='أسعار محفوظة — جاري التحديث...';
+el.style.cssText='font-size:9px;padding:3px 8px;border-radius:6px;border:1px solid rgba(255,194,51,.3);background:rgba(255,194,51,.08);color:#ffc233';
+}else{
 el.textContent='جاري تحميل الأسعار...';
 el.style.cssText='font-size:9px;padding:3px 8px;border-radius:6px;border:1px solid rgba(255,194,51,.3);background:rgba(255,194,51,.08);color:#ffc233';
+}
 
-const priceMap={};
+// Fetch via Yahoo Finance through multiple CORS proxies
+const priceMap=cached?{...cached.data}:{};
+const batchSize=30;
 
-// Fetch individual quotes in small parallel batches
-const batch=8;
-for(let i=0;i<uniqueDB.length;i+=batch){
-const slice=uniqueDB.slice(i,i+batch);
-const results=await Promise.allSettled(
-slice.map(b=>sahmkFetch(`/quote/${b.s}/`))
-);
-results.forEach((r,idx)=>{
-if(r.status==='fulfilled'&&r.value&&r.value.price){
-const q=r.value;
-priceMap[q.symbol||slice[idx].s]={
-price:q.price,change:q.change_percent||0,
-volume:q.volume||0,high:q.high||q.price,
-low:q.low||q.price,open:q.open||q.price,
-name:q.name,delayed:q.is_delayed
+for(let i=0;i<uniqueDB.length;i+=batchSize){
+const batch=uniqueDB.slice(i,i+batchSize);
+const symbols=batch.map(b=>b.s+'.SR').join(',');
+
+const proxies=[
+`/api/sahmk?path=/quote/${symbols}`,
+`https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v7/finance/quote?symbols='+symbols)}`,
+`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent('https://query1.finance.yahoo.com/v7/finance/quote?symbols='+symbols)}`,
+`https://corsproxy.io/?url=${encodeURIComponent('https://query1.finance.yahoo.com/v7/finance/quote?symbols='+symbols)}`
+];
+
+for(const url of proxies){
+try{
+const r=await fetch(url,{signal:AbortSignal.timeout(12000)});
+if(!r.ok)continue;
+const data=await r.json();
+const quotes=data?.quoteResponse?.result;
+if(quotes&&quotes.length>0){
+quotes.forEach(q=>{
+const sym=(q.symbol||'').replace('.SR','');
+if(q.regularMarketPrice){
+priceMap[sym]={
+price:q.regularMarketPrice,
+change:q.regularMarketChangePercent||0,
+volume:q.regularMarketVolume||0,
+high:q.regularMarketDayHigh||q.regularMarketPrice,
+low:q.regularMarketDayLow||q.regularMarketPrice,
+open:q.regularMarketOpen||q.regularMarketPrice,
+name:q.shortName||q.longName||''
 };
 }
 });
+break; // Success, skip other proxies
+}
+}catch(e){continue;}
+}
+
 el.textContent=`تحميل ${Object.keys(priceMap).length}/${uniqueDB.length}...`;
-if(i+batch<uniqueDB.length)await new Promise(r=>setTimeout(r,200));
+if(i+batchSize<uniqueDB.length)await new Promise(r=>setTimeout(r,500));
 }
 
 const found=Object.keys(priceMap).length;
 if(found<3){
-el.textContent='فشل تحميل الأسعار ⚠️';
+el.textContent='فشل التحميل — بيانات تقريبية ⚠️';
 el.style.cssText='font-size:9px;padding:3px 8px;border-radius:6px;border:1px solid rgba(255,92,114,.3);background:rgba(255,92,114,.08);color:#ff5c72';
 return false;
 }
 
+saveCache(priceMap);
+applyPrices(uniqueDB,priceMap);
+el.textContent=`أسعار حقيقية (متأخرة 15 دق) — ${found} سهم ✅`;
+el.style.cssText='font-size:9px;padding:3px 8px;border-radius:6px;border:1px solid rgba(0,212,170,.3);background:rgba(0,212,170,.08);color:#00d4aa';
+return true;
+}
+
+function applyPrices(uniqueDB,priceMap){
 stocks=uniqueDB.map(b=>{
 const r=priceMap[b.s];
-const price=r?+r.price.toFixed(2):b.bp;
-const chg=r?+r.change.toFixed(2):0;
+const price=r?+Number(r.price).toFixed(2):b.bp;
+const chg=r?+Number(r.change).toFixed(2):0;
 return{...b,price,change:chg,volume:r?r.volume:0,
 name:r?.name||b.n,
 rsi:Math.floor(28+mkrng(parseInt(b.s)*13)()*52),
@@ -445,15 +487,11 @@ score:Math.floor(20+mkrng(parseInt(b.s)*17)()*80),
 momentum:chg>0?'صاعد':'هابط',
 pe:+(8+mkrng(parseInt(b.s)*3)()*30).toFixed(1),
 cap:Math.floor(price*(50+mkrng(parseInt(b.s)*11)()*500)),
-high:r?+r.high.toFixed(2):+(price*1.015).toFixed(2),
-low:r?+r.low.toFixed(2):+(price*.985).toFixed(2),
+high:r?+Number(r.high||price).toFixed(2):+(price*1.015).toFixed(2),
+low:r?+Number(r.low||price).toFixed(2):+(price*.985).toFixed(2),
 support:+(price*.97).toFixed(2),resistance:+(price*1.03).toFixed(2),
 _real:!!r};
 });
-
-el.textContent=`أسعار حقيقية — ${found} سهم ✅`;
-el.style.cssText='font-size:9px;padding:3px 8px;border-radius:6px;border:1px solid rgba(0,212,170,.3);background:rgba(0,212,170,.08);color:#00d4aa';
-return true;
 }
 
 function genStocks(){
